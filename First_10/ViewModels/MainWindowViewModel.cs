@@ -31,6 +31,14 @@ namespace First_10.ViewModels
         private ICommand? _callEmptyStockAvailabilityWindowCommand;
         private ICommand? _calculateCostForEachCommand;
         private ICommand? _showProductsBySumCommand;
+        private ICommand? _showProductsByMaxSellCommand;
+        private ICommand? _showProductsByWarehouseCountCommand;
+        private ICommand? _showProducersBySellCountCommand;
+        private ICommand? _showOverallWarehouseCountCommand;
+        private ICommand? _showOverallWarehouseCountBySizeCommand;
+        private ICommand? _showSellsCountByDateCommand;
+        private ICommand? _showProductsWithoutSellsCommand;
+        private ICommand? _showProductsByCategoryCommand;
 
         public MainWindowViewModel(ProductService productService,
                                    MessageBoxService messageBoxService,
@@ -43,29 +51,91 @@ namespace First_10.ViewModels
 
         public ICommand CalculateCostForEachCommand =>
             _calculateCostForEachCommand
-                ??= new DelegateCommand(() =>
-                                        {
-                                            var a = _productService.GetWarehouseCostForEachProduct();
-
-                                            _messageBoxService.ShowInformation(a.ToString());
-                                        });
+                ??= new DelegateCommand(() => _messageBoxService.ShowInformation(_productService.GetWarehouseCostForEachProduct()));
 
         public ICommand ShowProductsBySumCommand =>
             _showProductsBySumCommand
                 ??= new DelegateCommand(() =>
                                         {
-                                            var vm = new NumberDialogViewModel();
+                                            var vm = new InputDialogViewModel<int?>();
 
-                                            var window = new NumberDialogWindow
+                                            var window = new InputDialogWindow
                                                          {
                                                              DataContext = vm
                                                          };
 
                                             window.ShowDialog();
 
-                                            if (vm.Number is >= 0)
-                                                _messageBoxService.ShowInformation(_productService.GetProductsSellsUpperSumOn(vm.Number.Value));
+                                            if (vm.Value is >= 0)
+                                                _messageBoxService.ShowInformation(_productService.GetProductsSellsUpperSumOn(vm.Value.Value));
                                         });
+
+        public ICommand ShowProductsByWarehouseCountCommand =>
+            _showProductsByWarehouseCountCommand
+                ??= new DelegateCommand(() =>
+                                        {
+                                            var vm = new InputDialogViewModel<int?>();
+
+                                            var window = new InputDialogWindow
+                                                         {
+                                                             DataContext = vm
+                                                         };
+
+                                            window.ShowDialog();
+
+                                            if (vm.Value is >= 0)
+                                                _messageBoxService.ShowInformation(_productService.GetProductsByWarehouseCount(vm.Value.Value));
+                                        });
+
+        public ICommand ShowProductsByCategoryCommand =>
+            _showProductsByCategoryCommand
+                ??= new DelegateCommand(() =>
+                                        {
+                                            var vm = new InputDialogViewModel<string?>();
+
+                                            var window = new InputDialogWindow
+                                                         {
+                                                             DataContext = vm
+                                                         };
+
+                                            window.ShowDialog();
+
+                                            if (!String.IsNullOrEmpty(vm.Value))
+                                                _messageBoxService.ShowInformation(_productService.GetProductsInformationByCategoryName(vm.Value));
+                                        });
+
+        public ICommand ShowSellsCountByDateCommand =>
+            _showSellsCountByDateCommand
+                ??= new DelegateCommand(() =>
+                                        {
+                                            var vm = new InputDialogViewModel<int?>();
+
+                                            var window = new InputDialogWindow
+                                                         {
+                                                             DataContext = vm
+                                                         };
+
+                                            window.ShowDialog();
+
+                                            if (vm.Value is >= 0)
+                                                _messageBoxService.ShowInformation(_productService.GetSellsCountByDate(vm.Value.Value));
+                                        });
+
+        public ICommand ShowProductsByMaxSellCommand =>
+            _showProductsByMaxSellCommand
+                ??= new DelegateCommand(() => _messageBoxService.ShowInformation(_productService.GetProductsByMaxSell()));
+
+        public ICommand ShowOverallWarehouseCountCommand =>
+            _showOverallWarehouseCountCommand
+                ??= new DelegateCommand(() => _messageBoxService.ShowInformation(_productService.GetOverallWarehouseCount().ToString()));
+
+        public ICommand ShowProductsWithoutSellsCommand =>
+            _showProductsWithoutSellsCommand
+                ??= new DelegateCommand(() => _messageBoxService.ShowInformation(_productService.GetProductWithoutSells()));
+
+        public ICommand ShowOverallWarehouseCountBySizeCommand =>
+            _showOverallWarehouseCountBySizeCommand
+                ??= new DelegateCommand(() => _messageBoxService.ShowInformation(_productService.GetOverallWarehouseCountBySize()));
 
         public ICommand UpdateProductsCommand =>
             _updateProductsCommand

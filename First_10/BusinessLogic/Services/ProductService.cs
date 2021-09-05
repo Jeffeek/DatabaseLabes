@@ -83,7 +83,9 @@ namespace First_10.BusinessLogic.Services
 
             var groupingStock = db.Set<StockAvailability>()
                                   .AsNoTracking()
+                                  .Where(x => !x.IsDeleted)
                                   .Include(x => x.Product)
+                                  .Where(x => !x.Product.IsDeleted)
                                   .AsEnumerable()
                                   .GroupBy(x => x.ProductId)
                                   .ToList();
@@ -107,6 +109,7 @@ namespace First_10.BusinessLogic.Services
                           .AsNoTracking()
                           .Include(x => x.Product)
                           .ThenInclude(x => x.StockAvailabilities)
+                          .Where(x => !x.Product.IsDeleted)
                           .Where(x => x.Product.StockAvailabilities.Sum(z => z.Discount != null ? z.Price * (z.Discount / 100.0d) * z.WarehouseCount : z.Price * z.WarehouseCount) > sum)
                           .AsEnumerable()
                           .GroupBy(x => x.ProductId)
@@ -131,6 +134,7 @@ namespace First_10.BusinessLogic.Services
             var sells = db.Set<Sell>()
                           .AsNoTracking()
                           .Include(x => x.Product)
+                          .Where(x => !x.Product.IsDeleted)
                           .AsEnumerable()
                           .GroupBy(x => x.ProductId)
                           .ToList();
@@ -142,6 +146,166 @@ namespace First_10.BusinessLogic.Services
             foreach (var sell in sells.Where(x => x.Sum(z => z.Count) == max))
             {
                 sb.Append($"{sell.First().Product.Title}");
+                sb.AppendLine();
+            }
+
+            return sb.ToString();
+        }
+
+        public string GetProductsByWarehouseCount(int warehouseCountBound)
+        {
+            using var db = _dbContextFactory.CreateDbContext();
+
+            var sells = db.Set<StockAvailability>()
+                          .AsNoTracking()
+                          .Where(x => !x.IsDeleted)
+                          .Include(x => x.Product)
+                          .Where(x => x.Price < 10000 && x.WarehouseCount > warehouseCountBound)
+                          .AsEnumerable()
+                          .GroupBy(x => x.ProductId)
+                          .ToList();
+
+            var sb = new StringBuilder();
+
+            foreach (var product in sells.Select(sell => sell.First()
+                                                             .Product))
+            {
+                sb.Append($"{product.Title} : {product.Producer}");
+                sb.AppendLine();
+            }
+
+            return sb.ToString();
+        }
+
+        public string GetProducersBySellCount(int priceBound)
+        {
+            using var db = _dbContextFactory.CreateDbContext();
+
+            var producersCount = db.Set<StockAvailability>()
+                                   .AsNoTracking()
+                                   .Where(x => !x.IsDeleted)
+                                   .Include(x => x.Product)
+                                   .AsEnumerable()
+                                   .GroupBy(x => x.Product.Producer)
+                                   .ToList();
+
+            var sb = new StringBuilder();
+
+            foreach (var availabilities in producersCount.Where(x => x.Sum(z => z.Price) > priceBound))
+            {
+                sb.Append($"{availabilities.Key}");
+                sb.AppendLine();
+            }
+
+            return sb.ToString();
+        }
+
+        public long GetOverallWarehouseCount()
+        {
+            using var db = _dbContextFactory.CreateDbContext();
+
+            var overallCount = db.Set<StockAvailability>()
+                                 .AsNoTracking()
+                                 .Where(x => !x.IsDeleted)
+                                 .Sum(x => (long)x.WarehouseCount);
+
+            return overallCount;
+        }
+
+        public string GetOverallWarehouseCountBySize()
+        {
+            using var db = _dbContextFactory.CreateDbContext();
+
+            var sells = db.Set<Sell>()
+                          .AsNoTracking()
+                          .Include(x => x.Product)
+                          .ThenInclude(x => x.StockAvailabilities.Where(z => !z.IsDeleted))
+                          .Where(x => !x.Product.IsDeleted)
+                          .AsEnumerable()
+                          .GroupBy(x => x.Size)
+                          .ToList();
+
+            var sb = new StringBuilder();
+
+            foreach (var sell in sells)
+            {
+                sb.Append($"{sell.Key} : {sell.Select(x => x.Product).Sum(x => x.StockAvailabilities.Sum(z => z.WarehouseCount))}");
+                sb.AppendLine();
+            }
+
+            return sb.ToString();
+        }
+
+        public string GetSellsCountByDate(int sellsCountBound)
+        {
+            using var db = _dbContextFactory.CreateDbContext();
+
+            var sellsByDate = db.Set<Sell>()
+                                .AsNoTracking()
+                                .GroupBy(x => x.SellDate)
+                                .Select(x => new
+                                             {
+                                                 Date = x.Key,
+                                                 Count = x.Count()
+                                             })
+                                .Where(x => x.Count < sellsCountBound)
+                                .ToList();
+
+            var resultList = new List<(DateTime, int)>();
+
+            foreach (var sell in sellsByDate.Where(sell => resultList.Count(x => x.Item1.Year == sell.Date.Year
+                                                                                 && x.Item1.Month == sell.Date.Month
+                                                                                 && x.Item1.Day == sell.Date.Day)
+                                                           == 0))
+                resultList.Add((sell.Date, sell.Count));
+
+            var sb = new StringBuilder();
+
+            foreach (var tuple in resultList)
+            {
+                sb.Append($"{tuple.Item1:yyyy-MM-dd} : {tuple.Item2}");
+                sb.AppendLine();
+            }
+
+            return sb.ToString();
+        }
+
+        public string GetProductWithoutSells()
+        {
+            using var db = _dbContextFactory.CreateDbContext();
+
+            var productsWithoutSells = db.Set<Product>()
+                                         .AsNoTracking()
+                                         .Where(x => !x.IsDeleted)
+                                         .Include(x => x.Sells)
+                                         .Where(x => !x.Sells!.Any())
+                                         .Select(x => x.Title)
+                                         .ToList();
+
+            return String.Join(Environment.NewLine, productsWithoutSells);
+        }
+
+        public string GetProductsInformationByCategoryName(string category)
+        {
+            using var db = _dbContextFactory.CreateDbContext();
+
+            var productsByCategory = db.Set<Product>()
+                                       .AsNoTracking()
+                                       .Include(x => x.StockAvailabilities)
+                                       .Where(x => !x.IsDeleted && x.Category == category)
+                                       .AsEnumerable()
+                                       .Select(x => new
+                                                    {
+                                                        ProductName = x.Title,
+                                                        Sum = x.StockAvailabilities.Sum(c => c.Discount != null ? c.Price * (c.Discount / 100.0d) * c.WarehouseCount : c.Price * c.WarehouseCount)
+                                                    })
+                                       .ToList();
+
+            var sb = new StringBuilder();
+
+            foreach (var categoryGroup in productsByCategory)
+            {
+                sb.Append($"{categoryGroup.ProductName} : {categoryGroup.Sum}");
                 sb.AppendLine();
             }
 

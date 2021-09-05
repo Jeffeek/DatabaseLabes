@@ -10,6 +10,7 @@
     Width="800"
     Height="450"
     prism:ViewModelLocator.AutoWireViewModel="True"
+    ResizeMode="NoResize"
     mc:Ignorable="d">
     <Grid>
         <Grid.RowDefinitions>

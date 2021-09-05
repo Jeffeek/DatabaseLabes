@@ -43,14 +43,73 @@
                             Margin="0,0,5,0"
                             BorderBrush="Black"
                             BorderThickness="0.5" />
-                        <Button
-                            Margin="0,0,5,0"
-                            Command="{Binding CalculateCostForEachCommand}"
-                            Content="Calculate cost for each" />
-                        <Button
-                            Margin="0,0,5,0"
-                            Command="{Binding ShowProductsBySumCommand}"
-                            Content="Show products by sum" />
+                        <ComboBox
+                            Width="50"
+                            IsEditable="False"
+                            IsReadOnly="True"
+                            Text="xcgxgxcvxcv">
+                            <ComboBoxItem>
+                                <Button
+                                    Margin="0,0,5,0"
+                                    Background="Transparent"
+                                    Command="{Binding CalculateCostForEachCommand}"
+                                    Content="Calculate cost for each" />
+                            </ComboBoxItem>
+                            <ComboBoxItem>
+                                <Button
+                                    Margin="0,0,5,0"
+                                    Command="{Binding ShowProductsBySumCommand}"
+                                    Content="Show products by sum" />
+                            </ComboBoxItem>
+                            <ComboBoxItem>
+                                <Button
+                                    Margin="0,0,5,0"
+                                    Command="{Binding ShowProductsByMaxSellCommand}"
+                                    Content="Show products by max sell" />
+                            </ComboBoxItem>
+                            <ComboBoxItem>
+                                <Button
+                                    Margin="0,0,5,0"
+                                    Command="{Binding ShowProductsByWarehouseCountCommand}"
+                                    Content="Show products by max sell" />
+                            </ComboBoxItem>
+                            <ComboBoxItem>
+                                <Button
+                                    Margin="0,0,5,0"
+                                    Command="{Binding ShowProducersBySellCountCommand}"
+                                    Content="Show producers by sell count" />
+                            </ComboBoxItem>
+                            <ComboBoxItem>
+                                <Button
+                                    Margin="0,0,5,0"
+                                    Command="{Binding ShowOverallWarehouseCountCommand}"
+                                    Content="Show overall warehouse count" />
+                            </ComboBoxItem>
+                            <ComboBoxItem>
+                                <Button
+                                    Margin="0,0,5,0"
+                                    Command="{Binding ShowOverallWarehouseCountBySizeCommand}"
+                                    Content="Show overall warehouse count by size" />
+                            </ComboBoxItem>
+                            <ComboBoxItem>
+                                <Button
+                                    Margin="0,0,5,0"
+                                    Command="{Binding ShowSellsCountByDateCommand}"
+                                    Content="Show sells count by date" />
+                            </ComboBoxItem>
+                            <ComboBoxItem>
+                                <Button
+                                    Margin="0,0,5,0"
+                                    Command="{Binding ShowProductsWithoutSellsCommand}"
+                                    Content="Show products without sells" />
+                            </ComboBoxItem>
+                            <ComboBoxItem>
+                                <Button
+                                    Margin="0,0,5,0"
+                                    Command="{Binding ShowProductsByCategoryCommand}"
+                                    Content="Show products by category" />
+                            </ComboBoxItem>
+                        </ComboBox>
                     </StackPanel>
                     <ListView
                         Grid.Row="1"
