@@ -6,9 +6,8 @@
     xmlns:local="clr-namespace:First_10.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title=""
-    Width="150"
-    Height="100"
-    ResizeMode="NoResize"
+    Width="200"
+    Height="150"
     Topmost="True"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">

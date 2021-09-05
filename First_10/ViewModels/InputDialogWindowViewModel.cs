@@ -2,7 +2,7 @@
 
 namespace First_10.ViewModels
 {
-    public class InputDialogViewModel<TValue> : BindableBase
+    public class InputDialogWindowViewModel<TValue> : BindableBase
     {
         private TValue? _value;
 

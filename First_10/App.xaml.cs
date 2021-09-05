@@ -25,7 +25,7 @@ namespace First_10
             containerRegistry.AddDbContextFactory(SharedDbContextOptions.GetOptions("server=DESKTOP-1MKQIKU\\MSSQLSERVER01;initial catalog=First_10;Trusted_Connection=True;multipleactiveresultsets=True;application name=EntityFramework"));
             containerRegistry.AddDbContext("server=DESKTOP-1MKQIKU\\MSSQLSERVER01;initial catalog=First_10;Trusted_Connection=True;multipleactiveresultsets=True;application name=EntityFramework", false);
             containerRegistry.AddAutoMapper();
-            containerRegistry.RegisterDialog<ProductWindow>("ProductWindow");
+            containerRegistry.RegisterDialog<CustomDialog, CustomDialogViewModel>();
             containerRegistry.Register<FileDialogService>();
             containerRegistry.Register<ImageService>();
             //containerRegistry.RegisterForNavigation<ProductWindowViewModel, ProductWindow>("ProductWindow");

@@ -8,13 +8,14 @@ using First_10.ViewModels.Models;
 using First_10.Views;
 using Prism.Commands;
 using Prism.Mvvm;
+using Prism.Services.Dialogs;
 
 namespace First_10.ViewModels
 {
     public class MainWindowViewModel : BindableBase
     {
         private readonly ProductService _productService;
-        private readonly MessageBoxService _messageBoxService;
+        private readonly IDialogService _dialogService;
         private readonly IMapper _mapper;
 
         private ObservableCollection<ProductViewModel> _products;
@@ -41,23 +42,54 @@ namespace First_10.ViewModels
         private ICommand? _showProductsByCategoryCommand;
 
         public MainWindowViewModel(ProductService productService,
-                                   MessageBoxService messageBoxService,
+                                   IDialogService dialogService,
                                    IMapper mapper)
         {
             _productService = productService;
-            _messageBoxService = messageBoxService;
+            _dialogService = dialogService;
             _mapper = mapper;
         }
 
+        public ICommand ShowProducersBySellCountCommand =>
+            _showProducersBySellCountCommand
+                ??= new DelegateCommand(() =>
+                                        {
+                                            var vm = new InputDialogWindowViewModel<int?>();
+
+                                            var window = new InputDialogWindow
+                                                         {
+                                                             DataContext = vm
+                                                         };
+
+                                            window.ShowDialog();
+
+                                            if (vm.Value.HasValue)
+                                                _dialogService.ShowDialog("CustomDialog",
+                                                                          new DialogParameters
+                                                                          {
+                                                                              {
+                                                                                  "Message", _productService.GetProducersByAvgSellCount(vm.Value.Value)
+                                                                              }
+                                                                          },
+                                                                          _ => { });
+                                        });
+
         public ICommand CalculateCostForEachCommand =>
             _calculateCostForEachCommand
-                ??= new DelegateCommand(() => _messageBoxService.ShowInformation(_productService.GetWarehouseCostForEachProduct()));
+                ??= new DelegateCommand(() => _dialogService.ShowDialog("CustomDialog",
+                                                                        new DialogParameters
+                                                                        {
+                                                                            {
+                                                                                "Message", _productService.GetWarehouseCostForEachProduct()
+                                                                            }
+                                                                        },
+                                                                        _ => { }));
 
         public ICommand ShowProductsBySumCommand =>
             _showProductsBySumCommand
                 ??= new DelegateCommand(() =>
                                         {
-                                            var vm = new InputDialogViewModel<int?>();
+                                            var vm = new InputDialogWindowViewModel<int?>();
 
                                             var window = new InputDialogWindow
                                                          {
@@ -67,14 +99,21 @@ namespace First_10.ViewModels
                                             window.ShowDialog();
 
                                             if (vm.Value is >= 0)
-                                                _messageBoxService.ShowInformation(_productService.GetProductsSellsUpperSumOn(vm.Value.Value));
+                                                _dialogService.ShowDialog("CustomDialog",
+                                                                          new DialogParameters
+                                                                          {
+                                                                              {
+                                                                                  "Message", _productService.GetProductsSellsUpperSumOn(vm.Value.Value)
+                                                                              }
+                                                                          },
+                                                                          _ => { });
                                         });
 
         public ICommand ShowProductsByWarehouseCountCommand =>
             _showProductsByWarehouseCountCommand
                 ??= new DelegateCommand(() =>
                                         {
-                                            var vm = new InputDialogViewModel<int?>();
+                                            var vm = new InputDialogWindowViewModel<int?>();
 
                                             var window = new InputDialogWindow
                                                          {
@@ -84,14 +123,21 @@ namespace First_10.ViewModels
                                             window.ShowDialog();
 
                                             if (vm.Value is >= 0)
-                                                _messageBoxService.ShowInformation(_productService.GetProductsByWarehouseCount(vm.Value.Value));
+                                                _dialogService.ShowDialog("CustomDialog",
+                                                                          new DialogParameters
+                                                                          {
+                                                                              {
+                                                                                  "Message", _productService.GetProductsByWarehouseCount(vm.Value.Value)
+                                                                              }
+                                                                          },
+                                                                          _ => { });
                                         });
 
         public ICommand ShowProductsByCategoryCommand =>
             _showProductsByCategoryCommand
                 ??= new DelegateCommand(() =>
                                         {
-                                            var vm = new InputDialogViewModel<string?>();
+                                            var vm = new InputDialogWindowViewModel<string?>();
 
                                             var window = new InputDialogWindow
                                                          {
@@ -101,14 +147,21 @@ namespace First_10.ViewModels
                                             window.ShowDialog();
 
                                             if (!String.IsNullOrEmpty(vm.Value))
-                                                _messageBoxService.ShowInformation(_productService.GetProductsInformationByCategoryName(vm.Value));
+                                                _dialogService.ShowDialog("CustomDialog",
+                                                                          new DialogParameters
+                                                                          {
+                                                                              {
+                                                                                  "Message", _productService.GetProductsInformationByCategoryName(vm.Value)
+                                                                              }
+                                                                          },
+                                                                          _ => { });
                                         });
 
         public ICommand ShowSellsCountByDateCommand =>
             _showSellsCountByDateCommand
                 ??= new DelegateCommand(() =>
                                         {
-                                            var vm = new InputDialogViewModel<int?>();
+                                            var vm = new InputDialogWindowViewModel<int?>();
 
                                             var window = new InputDialogWindow
                                                          {
@@ -118,24 +171,60 @@ namespace First_10.ViewModels
                                             window.ShowDialog();
 
                                             if (vm.Value is >= 0)
-                                                _messageBoxService.ShowInformation(_productService.GetSellsCountByDate(vm.Value.Value));
+                                                _dialogService.ShowDialog("CustomDialog",
+                                                                          new DialogParameters
+                                                                          {
+                                                                              {
+                                                                                  "Message", _productService.GetSellsCountByDate(vm.Value.Value)
+                                                                              }
+                                                                          },
+                                                                          _ => { });
                                         });
 
         public ICommand ShowProductsByMaxSellCommand =>
             _showProductsByMaxSellCommand
-                ??= new DelegateCommand(() => _messageBoxService.ShowInformation(_productService.GetProductsByMaxSell()));
+                ??= new DelegateCommand(() => _dialogService.ShowDialog("CustomDialog",
+                                                                        new DialogParameters
+                                                                        {
+                                                                            {
+                                                                                "Message", _productService.GetProductsByMaxSell()
+                                                                            }
+                                                                        },
+                                                                        _ => { }));
 
         public ICommand ShowOverallWarehouseCountCommand =>
             _showOverallWarehouseCountCommand
-                ??= new DelegateCommand(() => _messageBoxService.ShowInformation(_productService.GetOverallWarehouseCount().ToString()));
+                ??= new DelegateCommand(() => _dialogService.ShowDialog("CustomDialog",
+                                                                        new DialogParameters
+                                                                        {
+                                                                            {
+                                                                                "Message", _productService.GetOverallWarehouseCount()
+                                                                                    .ToString()
+                                                                            }
+                                                                        },
+                                                                        _ => { }));
 
         public ICommand ShowProductsWithoutSellsCommand =>
             _showProductsWithoutSellsCommand
-                ??= new DelegateCommand(() => _messageBoxService.ShowInformation(_productService.GetProductWithoutSells()));
+                ??= new DelegateCommand(() => _dialogService.ShowDialog("CustomDialog",
+                                                                        new DialogParameters
+                                                                        {
+                                                                            {
+                                                                                "Message", _productService.GetProductsWithoutSells()
+                                                                            }
+                                                                        },
+                                                                        _ => { }));
 
         public ICommand ShowOverallWarehouseCountBySizeCommand =>
             _showOverallWarehouseCountBySizeCommand
-                ??= new DelegateCommand(() => _messageBoxService.ShowInformation(_productService.GetOverallWarehouseCountBySize()));
+                ??= new DelegateCommand(() => _dialogService.ShowDialog("CustomDialog",
+                                                                        new DialogParameters
+                                                                        {
+                                                                            {
+                                                                                "Message", _productService.GetOverallWarehouseCountBySize()
+                                                                            }
+                                                                        },
+                                                                        _ => { }));
 
         public ICommand UpdateProductsCommand =>
             _updateProductsCommand

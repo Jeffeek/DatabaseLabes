@@ -160,7 +160,7 @@ namespace First_10.BusinessLogic.Services
                           .AsNoTracking()
                           .Where(x => !x.IsDeleted)
                           .Include(x => x.Product)
-                          .Where(x => x.Price < 10000 && x.WarehouseCount > warehouseCountBound)
+                          .Where(x => x.Price <= 10000 && x.WarehouseCount > warehouseCountBound)
                           .AsEnumerable()
                           .GroupBy(x => x.ProductId)
                           .ToList();
@@ -177,7 +177,7 @@ namespace First_10.BusinessLogic.Services
             return sb.ToString();
         }
 
-        public string GetProducersBySellCount(int priceBound)
+        public string GetProducersByAvgSellCount(int priceBound)
         {
             using var db = _dbContextFactory.CreateDbContext();
 
@@ -191,7 +191,7 @@ namespace First_10.BusinessLogic.Services
 
             var sb = new StringBuilder();
 
-            foreach (var availabilities in producersCount.Where(x => x.Sum(z => z.Price) > priceBound))
+            foreach (var availabilities in producersCount.Where(x => x.Average(z => z.Price) > priceBound))
             {
                 sb.Append($"{availabilities.Key}");
                 sb.AppendLine();
@@ -270,7 +270,7 @@ namespace First_10.BusinessLogic.Services
             return sb.ToString();
         }
 
-        public string GetProductWithoutSells()
+        public string GetProductsWithoutSells()
         {
             using var db = _dbContextFactory.CreateDbContext();
 

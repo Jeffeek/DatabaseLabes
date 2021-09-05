@@ -71,13 +71,13 @@
                                 <Button
                                     Margin="0,0,5,0"
                                     Command="{Binding ShowProductsByWarehouseCountCommand}"
-                                    Content="Show products by max sell" />
+                                    Content="Show products by warehouse count" />
                             </ComboBoxItem>
                             <ComboBoxItem>
                                 <Button
                                     Margin="0,0,5,0"
                                     Command="{Binding ShowProducersBySellCountCommand}"
-                                    Content="Show producers by sell count" />
+                                    Content="Show producers by average sell count" />
                             </ComboBoxItem>
                             <ComboBoxItem>
                                 <Button

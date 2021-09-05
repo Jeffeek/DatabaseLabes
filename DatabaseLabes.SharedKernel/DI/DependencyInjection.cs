@@ -49,5 +49,6 @@ namespace DatabaseLabes.SharedKernel.DI
             from aType in assembly.GetTypes()
             where aType.IsClass && aType.GetConstructor(Type.EmptyTypes) != null && !aType.IsAbstract && aType.IsSubclassOf(typeof(Profile))
             select (Profile)Activator.CreateInstance(aType);
+
     }
 }

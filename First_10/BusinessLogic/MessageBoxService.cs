@@ -29,7 +29,5 @@ namespace First_10.BusinessLogic
 
             return result == MessageBoxResult.OK;
         }
-
-        public void ShowInformation(string message) => MessageBox.Show(message, "Information", MessageBoxButton.OK, MessageBoxImage.Information);
     }
 }
