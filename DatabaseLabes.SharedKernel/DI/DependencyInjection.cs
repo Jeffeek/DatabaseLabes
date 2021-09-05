@@ -4,6 +4,9 @@ using System.Linq;
 using AutoMapper;
 using DatabaseLabes.SharedKernel.DataAccess;
 using DatabaseLabes.SharedKernel.Shared;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.Extensions.DependencyInjection;
 using Prism.Ioc;
 
 namespace DatabaseLabes.SharedKernel.DI
@@ -21,6 +24,16 @@ namespace DatabaseLabes.SharedKernel.DI
                                                                           ? new ApplicationDbContext(SharedDbContextOptions.GetOptions())
                                                                           : new ApplicationDbContext(SharedDbContextOptions.GetOptions(connectionString));
                                                            });
+        }
+
+        public static void AddDbContextFactory(this IContainerRegistry container, DbContextOptions<ApplicationDbContext> options)
+        {
+            container.RegisterSingleton<IDbContextFactory<ApplicationDbContext>>(() =>
+                                                                                     new DbContextFactory<ApplicationDbContext>((container as
+                                                                                                     IContainerExtension)
+                                                                                         .CreateServiceProvider(new ServiceCollection()),
+                                                                                         options,
+                                                                                         new DbContextFactorySource<ApplicationDbContext>()));
         }
 
         public static IContainerRegistry AddAutoMapper(this IContainerRegistry containerRegistry)

@@ -6,10 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="WPF\App.xaml" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ApplicationDefinition Include="WPF\App.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
@@ -30,7 +26,9 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Prism.Container.Extensions" Version="8.0.62" />
     <PackageReference Include="Prism.Core" Version="8.1.97" />
+    <PackageReference Include="Prism.Unity.Extensions" Version="8.0.62" />
   </ItemGroup>
 
 </Project>

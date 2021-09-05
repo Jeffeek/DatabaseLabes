@@ -1,14 +1,14 @@
 ﻿<Window
-    x:Class="First_10.Views.ProductWindow"
+    x:Class="First_10.Views.SellWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:First_10.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:prism="http://prismlibrary.com/"
-    Title="ProductWindow"
+    Title="SellWindow"
     Width="500"
-    Height="300"
+    Height="400"
     prism:ViewModelLocator.AutoWireViewModel="True"
     mc:Ignorable="d">
     <Grid>
@@ -17,22 +17,17 @@
             <RowDefinition Height="0.8*" />
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0">
-            <Button Command="{Binding CreateProductCommand}" Content="Add" />
-            <Button Command="{Binding UpdateProductCommand}" Content="Update" />
-            <Button Command="{Binding DeleteProductCommand}" Content="Delete" />
+            <Button Command="{Binding CreateSellCommand}" Content="Add" />
+            <Button Command="{Binding UpdateSellCommand}" Content="Update" />
+            <Button Command="{Binding DeleteSellCommand}" Content="Delete" />
         </StackPanel>
         <Grid Grid.Row="1">
             <Grid.RowDefinitions>
+                <RowDefinition Height="0.2*" />
                 <RowDefinition Height="0.1*" />
-                <RowDefinition Height="0.1*" />
-                <RowDefinition Height="0.1*" />
-                <RowDefinition Height="0.1*" />
+                <RowDefinition Height="0.6*" />
                 <RowDefinition Height="0.1*" />
             </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="0.6*" />
-                <ColumnDefinition Width="0.3*" />
-            </Grid.ColumnDefinitions>
             <Grid Grid.Row="0" Grid.Column="0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="0.25*" />
@@ -42,12 +37,18 @@
                     Grid.Column="0"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
-                    Text="Title" />
-                <TextBox
+                    Text="Product" />
+                <ComboBox
                     Grid.Column="1"
                     VerticalAlignment="Center"
                     VerticalContentAlignment="Center"
-                    Text="{Binding Product.Title}" />
+                    DisplayMemberPath="Title"
+                    IsEditable="True"
+                    IsTextSearchCaseSensitive="True"
+                    IsTextSearchEnabled="True"
+                    ItemsSource="{Binding ProductSells}"
+                    SelectedItem="{Binding Sell.Product}"
+                    Text="{Binding SearchText}" />
             </Grid>
             <Grid Grid.Row="1" Grid.Column="0">
                 <Grid.ColumnDefinitions>
@@ -58,12 +59,12 @@
                     Grid.Column="0"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
-                    Text="Producer" />
+                    Text="Size" />
                 <TextBox
                     Grid.Column="1"
                     VerticalAlignment="Center"
                     VerticalContentAlignment="Center"
-                    Text="{Binding Product.Producer}" />
+                    Text="{Binding Sell.Size}" />
             </Grid>
             <Grid Grid.Row="2" Grid.Column="0">
                 <Grid.ColumnDefinitions>
@@ -74,12 +75,13 @@
                     Grid.Column="0"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
-                    Text="Category" />
-                <TextBox
+                    Text="SellDate" />
+                <Calendar
                     Grid.Column="1"
                     VerticalAlignment="Center"
                     VerticalContentAlignment="Center"
-                    Text="{Binding Product.Category}" />
+                    DisplayDate="{Binding Sell.SellDate}"
+                    IsTodayHighlighted="True" />
             </Grid>
             <Grid Grid.Row="3" Grid.Column="0">
                 <Grid.ColumnDefinitions>
@@ -90,48 +92,13 @@
                     Grid.Column="0"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
-                    Text="Description" />
+                    Text="Count" />
                 <TextBox
                     Grid.Column="1"
                     VerticalAlignment="Center"
                     VerticalContentAlignment="Center"
-                    Text="{Binding Product.Description}" />
+                    Text="{Binding Sell.Count}" />
             </Grid>
-            <Grid Grid.Row="4" Grid.Column="0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="0.25*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <TextBlock
-                    Grid.Column="0"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    Text="Availability" />
-                <TextBox
-                    Grid.Column="1"
-                    VerticalAlignment="Center"
-                    VerticalContentAlignment="Center"
-                    Text="{Binding Product.Availability}" />
-            </Grid>
-            <ContentPresenter
-                Grid.Row="0"
-                Grid.RowSpan="5"
-                Grid.Column="1">
-                <ContentPresenter.Content>
-                    <Border
-                        Background="Transparent"
-                        BorderBrush="BlueViolet"
-                        BorderThickness="2">
-                        <Image Source="{Binding Product.Photo}" Stretch="Fill" />
-                    </Border>
-                </ContentPresenter.Content>
-                <ContentPresenter.ContextMenu>
-                    <ContextMenu>
-                        <MenuItem Command="{Binding PasteImageCommand}" Header="Paste" />
-                        <MenuItem Command="{Binding DeleteImageCommand}" Header="Delete" />
-                    </ContextMenu>
-                </ContentPresenter.ContextMenu>
-            </ContentPresenter>
         </Grid>
     </Grid>
 </Window>

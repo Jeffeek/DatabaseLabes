@@ -1,5 +1,7 @@
 ﻿using System.Windows;
 using DatabaseLabes.SharedKernel.DI;
+using DatabaseLabes.SharedKernel.Shared;
+using First_10.BusinessLogic;
 using First_10.ViewModels;
 using First_10.ViewModels.Models;
 using First_10.Views;
@@ -20,9 +22,13 @@ namespace First_10
         /// <inheritdoc />
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            containerRegistry.AddDbContext("server=localhost;initial catalog=First_10;Trusted_Connection=True;multipleactiveresultsets=True;application name=EntityFramework", false);
+            containerRegistry.AddDbContextFactory(SharedDbContextOptions.GetOptions("server=DESKTOP-1MKQIKU\\MSSQLSERVER01;initial catalog=First_10;Trusted_Connection=True;multipleactiveresultsets=True;application name=EntityFramework"));
+            containerRegistry.AddDbContext("server=DESKTOP-1MKQIKU\\MSSQLSERVER01;initial catalog=First_10;Trusted_Connection=True;multipleactiveresultsets=True;application name=EntityFramework", false);
             containerRegistry.AddAutoMapper();
-            containerRegistry.RegisterForNavigation<ProductWindowViewModel, ProductWindow>("ProductWindow");
+            containerRegistry.RegisterDialog<ProductWindow>("ProductWindow");
+            containerRegistry.Register<FileDialogService>();
+            containerRegistry.Register<ImageService>();
+            //containerRegistry.RegisterForNavigation<ProductWindowViewModel, ProductWindow>("ProductWindow");
         }
 
         /// <inheritdoc />

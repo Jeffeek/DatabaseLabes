@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using DatabaseLabes.SharedKernel.DataAccess.Models;
 
 namespace First_10.DataAccess.Models

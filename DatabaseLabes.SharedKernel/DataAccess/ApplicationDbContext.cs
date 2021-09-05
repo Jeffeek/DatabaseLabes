@@ -30,6 +30,20 @@ namespace DatabaseLabes.SharedKernel.DataAccess
             return base.SaveChangesAsync(cancellationToken);
         }
 
+        /// <inheritdoc />
+        public override int SaveChanges()
+        {
+            foreach (var product in ChangeTracker.Entries<ISoftDelete>()
+                                                 .Where(product => product.State == EntityState.Deleted))
+            {
+                product.Entity.IsDeleted = true;
+                product.Entity.Deleted = DateTime.Now;
+                product.State = EntityState.Modified;
+            }
+
+            return base.SaveChanges();
+        }
+
         #region Overrides of DbContext
 
         /// <inheritdoc />

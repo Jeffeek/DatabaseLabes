@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using DatabaseLabes.SharedKernel.Query;
 using First_10.DataAccess.Models;
@@ -15,7 +16,7 @@ namespace First_10.Queries
         {
             var result = base.GetIncludes();
 
-            result.Add(x => x.StockAvailabilities);
+            result.Add(x => x.StockAvailabilities.Where(z => !z.IsDeleted));
             result.Add(x => x.Sells);
 
             return result;

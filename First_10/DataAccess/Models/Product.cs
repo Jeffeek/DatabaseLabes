@@ -8,11 +8,11 @@ namespace First_10.DataAccess.Models
     {
         public int Id { get; set; }
 
-        public string? Title { get; set; }
+        public string Title { get; set; } = default!;
 
-        public string? Producer { get; set; }
+        public string Producer { get; set; } = default!;
 
-        public string? Category { get; set; }
+        public string Category { get; set; } = default!;
 
         public string? Description { get; set; }
 
