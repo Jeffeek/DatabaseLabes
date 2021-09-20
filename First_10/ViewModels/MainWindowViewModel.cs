@@ -1,14 +1,22 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Drawing;
+using System.IO;
+using System.Linq;
 using System.Windows.Input;
 using AutoMapper;
+using DatabaseLabes.SharedKernel.DataAccess;
 using First_10.BusinessLogic;
 using First_10.BusinessLogic.Services;
+using First_10.DataAccess.Models;
 using First_10.ViewModels.Models;
 using First_10.Views;
+using Microsoft.EntityFrameworkCore;
 using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Services.Dialogs;
+using Xceed.Document.NET;
+using Xceed.Words.NET;
 
 namespace First_10.ViewModels
 {
@@ -16,6 +24,7 @@ namespace First_10.ViewModels
     {
         private readonly ProductService _productService;
         private readonly IDialogService _dialogService;
+        private readonly IDbContextFactory<ApplicationDbContext> _dbContextFactory;
         private readonly IMapper _mapper;
 
         private ObservableCollection<ProductViewModel> _products;
@@ -40,13 +49,16 @@ namespace First_10.ViewModels
         private ICommand? _showSellsCountByDateCommand;
         private ICommand? _showProductsWithoutSellsCommand;
         private ICommand? _showProductsByCategoryCommand;
+        private ICommand? _createReportCommand;
 
         public MainWindowViewModel(ProductService productService,
                                    IDialogService dialogService,
+                                   IDbContextFactory<ApplicationDbContext> dbContextFactory,
                                    IMapper mapper)
         {
             _productService = productService;
             _dialogService = dialogService;
+            _dbContextFactory = dbContextFactory;
             _mapper = mapper;
         }
 
@@ -305,6 +317,55 @@ namespace First_10.ViewModels
 
                                             UpdateProductsCommand?.Execute(null);
                                         });
+
+        public ICommand CreateReportCommand =>
+            _createReportCommand ??= new DelegateCommand(() =>
+                                                         {
+                                                             var db = _dbContextFactory.CreateDbContext();
+
+                                                             var getActiveProductsQuery = db.Set<Product>()
+                                                                                            .AsNoTracking()
+                                                                                            .Where(x => !x.IsDeleted)
+                                                                                            .Select(x => x.Id);
+
+                                                             var getSellsByToday = db.Set<Sell>()
+                                                                                     .AsNoTracking()
+                                                                                     .Where(x => x.SellDate.Day == DateTime.Now.Day && x.SellDate.Year == DateTime.Now.Year && x.SellDate.Month == DateTime.Now.Month)
+                                                                                     .Select(x => new
+                                                                                                  {
+                                                                                                      x.Id,
+                                                                                                      x.SellDate,
+                                                                                                      x.Count
+                                                                                                  });
+
+                                                             var name = DateTime.Now.ToString("dd.MM.yyyy.HH.mm.ss") + ".docx";
+                                                             name = Path.Combine(Directory.GetCurrentDirectory(), name);
+                                                             var doc = DocX.Create(name);
+
+                                                             var paragraph = doc.InsertParagraph();
+                                                             paragraph.Append("Запрос №1 (вывести идентификаторы продуктов, которые не удалены): ");
+                                                             paragraph.Alignment = Alignment.center;
+                                                             paragraph.Color(Color.Brown);
+
+                                                             paragraph = doc.InsertParagraph();
+                                                             paragraph.Append($"Запрос: {getActiveProductsQuery.ToQueryString()}");
+
+                                                             paragraph = doc.InsertParagraph();
+                                                             paragraph.Append($"Выборка: {String.Join(',', getActiveProductsQuery.ToList())}");
+
+                                                             paragraph = doc.InsertParagraph();
+                                                             paragraph.Append("Запрос №2 (вывести продажи, которые были сегодня): ");
+                                                             paragraph.Alignment = Alignment.center;
+                                                             paragraph.Color(Color.Brown);
+
+                                                             paragraph = doc.InsertParagraph();
+                                                             paragraph.Append($"Запрос: {getSellsByToday.ToQueryString()}");
+
+                                                             paragraph = doc.InsertParagraph();
+                                                             paragraph.Append($"Выборка: {String.Join(',', getSellsByToday.ToList())}");
+
+                                                             doc.SaveAs(name);
+                                                         });
 
         public ObservableCollection<ProductViewModel> Products
         {

@@ -1,0 +1,3 @@
+{
+  "ConnectionString": "server=localhost;initial catalog=First_10;Trusted_Connection=True;multipleactiveresultsets=True;application name=EntityFramework"
+}

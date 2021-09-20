@@ -1,10 +1,14 @@
-﻿using System.Windows;
+﻿using System.IO;
+using System.Text;
+using System.Windows;
 using DatabaseLabes.SharedKernel.DI;
 using DatabaseLabes.SharedKernel.Shared;
 using First_10.BusinessLogic;
+using First_10.Settings;
 using First_10.ViewModels;
 using First_10.ViewModels.Models;
 using First_10.Views;
+using Newtonsoft.Json;
 using Prism;
 using Prism.Ioc;
 using Prism.Unity;
@@ -22,13 +26,23 @@ namespace First_10
         /// <inheritdoc />
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            containerRegistry.AddDbContextFactory(SharedDbContextOptions.GetOptions("server=DESKTOP-1MKQIKU\\MSSQLSERVER01;initial catalog=First_10;Trusted_Connection=True;multipleactiveresultsets=True;application name=EntityFramework"));
-            containerRegistry.AddDbContext("server=DESKTOP-1MKQIKU\\MSSQLSERVER01;initial catalog=First_10;Trusted_Connection=True;multipleactiveresultsets=True;application name=EntityFramework", false);
+            containerRegistry.RegisterScoped<AppConfiguration>(() =>
+                                                               {
+                                                                   using var stream =
+                                                                       new StreamReader(File.OpenRead(Path.Combine(Directory.GetCurrentDirectory(),
+                                                                                                          "appconfig.json")),
+                                                                                        Encoding.ASCII);
+
+                                                                   return JsonConvert.DeserializeObject<AppConfiguration>(stream.ReadToEnd());
+                                                               });
+
+            var config = Container.Resolve<AppConfiguration>();
+            containerRegistry.AddDbContextFactory(SharedDbContextOptions.GetOptions(config.ConnectionString));
+            containerRegistry.AddDbContext(config.ConnectionString, false);
             containerRegistry.AddAutoMapper();
             containerRegistry.RegisterDialog<CustomDialog, CustomDialogViewModel>();
             containerRegistry.Register<FileDialogService>();
             containerRegistry.Register<ImageService>();
-            //containerRegistry.RegisterForNavigation<ProductWindowViewModel, ProductWindow>("ProductWindow");
         }
 
         /// <inheritdoc />
